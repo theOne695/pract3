@@ -22,10 +22,10 @@ namespace pract3
 {
     public partial class MainWindow : Window
     {
-        private List<string> audioFiles; // Список путей к аудиофайлам
-        private int currentFileIndex; // Индекс текущего аудиофайла
-        private CancellationTokenSource cancellationTokenSource; // Источник для отмены потока
-        private bool isAudioPlaying = false; // Флаг, указывающий, проигрывается ли аудио в данный момент
+        private List<string> audioFiles;
+        private int currentFileIndex;
+        private CancellationTokenSource cancellationTokenSource;
+        private bool isAudioPlaying = false;
         private DispatcherTimer sliderUpdateTimer;
 
         public MainWindow()
@@ -33,8 +33,6 @@ namespace pract3
             InitializeComponent();
             audioFiles = new List<string>();
             currentFileIndex = 0;
-
-            // Создание таймера с интервалом 100 миллисекунд
             sliderUpdateTimer = new DispatcherTimer();
             sliderUpdateTimer.Interval = TimeSpan.FromMilliseconds(100);
             sliderUpdateTimer.Tick += SliderUpdateTimer_Tick;
@@ -69,17 +67,14 @@ namespace pract3
 
         private async Task LoadAudioFiles(string folderPath)
         {
-            // Очистка списка аудиофайлов
             audioFiles.Clear();
 
-            // Получение всех файлов в выбранной папке с расширениями mp3, m4a, wav и прочими
             string[] files = Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
                 .Where(file => file.EndsWith(".mp3") || file.EndsWith(".m4a") || file.EndsWith(".wav"))
                 .ToArray();
 
             audioFiles.AddRange(files);
 
-            // Обновление ListBox с файлами
             FileTxt.ItemsSource = audioFiles.Select(System.IO.Path.GetFileName);
         }
 
@@ -91,11 +86,8 @@ namespace pract3
             string audioPath = audioFiles[currentFileIndex];
             media.Source = new Uri(audioPath);
             media.Play();
-
             isAudioPlaying = true;
             media.MediaOpened += Media_MediaOpened;
-
-            // Запуск таймера для обновления позиции слайдера
             sliderUpdateTimer.Start();
         }
 
@@ -131,7 +123,6 @@ namespace pract3
                     audioSlider.Maximum = media.NaturalDuration.TimeSpan.TotalSeconds;
                     audioSlider.Value = media.Position.TotalSeconds;
                 });
-
                 Thread.Sleep(100);
             }
         }
