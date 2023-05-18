@@ -8,8 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="26786.png" />
+    <None Remove="267fff86.png" />
+    <None Remove="267j86.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="26786.png" />
+    <Resource Include="267fff86.png" />
+    <Resource Include="267j86.png" />
   </ItemGroup>
 
 </Project>

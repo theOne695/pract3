@@ -28,25 +28,23 @@
 
         <Button x:Name="OpenBtn" Grid.Column="1" Content="Открыть папку с музыкой" Grid.ColumnSpan="4" Background="#FFD1D1D1" BorderBrush="White" Foreground="Black" Click="OpenBtn_Click_1" FontSize="20"/>
 
-        <MediaElement x:Name="media" LoadedBehavior="Manual" MediaOpened="media_MediaOpened_1" Grid.ColumnSpan="6" Grid.RowSpan="6"/>
+        <MediaElement x:Name="media" LoadedBehavior="Manual" MediaEnded="media_MediaEnded_1" Grid.ColumnSpan="6" Grid.RowSpan="6"/>
 
-        <Button Style="{StaticResource MaterialDesignIconButton}" Command="{Binding PreviousCommand}" Grid.Row="5">
-            <materialDesign:PackIcon x:Name="LeftBtn" Kind="ChevronLeft" Height="40" Width="40" Foreground="Black"/>
+        <Button x:Name="LeftBtn"  Grid.Row="5" Click="LeftBtn_Click" BorderBrush="White" >
+            <Button.Background>
+                <ImageBrush ImageSource="/267j86.png" Stretch="Uniform"/>
+            </Button.Background>
         </Button>
 
         <Button x:Name="PlayBtn" Style="{StaticResource MaterialDesignIconButton}" ToolTip="MaterialDesignIconButton"
         IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-        Grid.Row="5" Grid.Column="1">
+        Grid.Row="5" Grid.Column="1" Click="PlayBtn_Click">
             <materialDesign:PackIcon Kind="Play" Foreground="Black"/>
         </Button>
 
-        <Button x:Name="RightBtn" Style="{StaticResource MaterialDesignIconButton}"
-        Command="{Binding NextCommand}" Grid.Row="5" Grid.Column="2">
-            <materialDesign:PackIcon x:Name="RightButton2" Kind="ChevronRight" Height="40" Width="40" Foreground="Black"/>
-        </Button>
 
         <Button Style="{StaticResource MaterialDesignFloatingActionButton}" Command="{Binding RepeatCommand}"
-        ToolTip="Repeat" Grid.Column="3" Grid.Row="5" Height="42" Width="42" Background="White" BorderBrush="White">
+        ToolTip="Repeat" Grid.Column="3" Grid.Row="5" Height="42" Width="42" Background="White" BorderBrush="White" Cursor="Hand" Click="RepeatBtn_Click">
             <Button.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="1"/>
@@ -56,23 +54,18 @@
             <materialDesign:PackIcon x:Name="RepeatBtn" Kind="Repeat" Height="24" Width="24"/>
         </Button>
 
-        <Button x:Name="RandomButton" Style="{StaticResource MaterialDesignFloatingActionButton}" Command="{Binding RandomCommand}"
-        ToolTip="Random" Grid.Column="4" Grid.Row="5" Height="42" Width="43" Background="White" BorderBrush="White">
+        <Button x:Name="ShuffleBtn" Style="{StaticResource MaterialDesignFloatingActionButton}" Command="{Binding RandomCommand}"
+        ToolTip="Random" Grid.Column="4" Grid.Row="5" Height="42" Width="43" Background="White" BorderBrush="White" Click="ShuffleBtn_Click">
             <materialDesign:PackIcon x:Name="RandomBtn" Kind="Shuffle" Height="24" Width="24" Background="White" Foreground="Black"/>
         </Button>
 
-        <Slider x:Name="audioSlider" Minimum="0" Maximum="35" Value="35" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="4" Foreground="Black" VerticalAlignment="Center" ValueChanged="audioSlider_ValueChanged"/>
+        <Slider x:Name="audioSlider" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="4" Foreground="Black" VerticalAlignment="Center" ValueChanged="audioSlider_ValueChanged"/>
 
-        <TextBlock x:Name="timer_start" Grid.Column="1" Grid.Row="4" Text="п" VerticalAlignment="Bottom" Width="60"/>
+        <TextBlock x:Name="timer_start" Grid.Column="1" Grid.Row="4" Text="" VerticalAlignment="Bottom" Width="60"/>
 
-        <TextBlock x:Name="timer_end" Grid.Column="4" Grid.Row="4" Text="п" VerticalAlignment="Bottom" Width="60"/>
+        <TextBlock x:Name="timer_end" Grid.Column="4" Grid.Row="4" Text="" VerticalAlignment="Bottom" Width="60"/>
 
-        <Slider x:Name="VolumeSlider" Orientation="Horizontal" Minimum="0" Maximum="{Binding DiscreteVertical.Maximum}"
-                Value="70000" Style="{StaticResource MaterialDesignDiscreteSlider}"
-                TickFrequency="{Binding DiscreteVertical.TickFrequency}"
-                TickPlacement="BottomRight" Grid.Column="5" Grid.Row="5" VerticalAlignment="Center" Foreground="Black"/>
-
-        <ListBox x:Name="FileTxt" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3"/>
+        <ListBox x:Name="FileTxt" Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3" SelectionChanged="FileTxt_SelectionChanged"/>
 
         <TextBlock HorizontalAlignment="Center" Grid.Row="5" Text="Назад" VerticalAlignment="Bottom" FontSize="15"/>
 
@@ -84,6 +77,14 @@
 
         <TextBlock HorizontalAlignment="Center" Grid.Row="5" Grid.Column="4" Text="Случайно" VerticalAlignment="Bottom" FontSize="15"/>
 
-        <TextBlock HorizontalAlignment="Center" Grid.Row="5" Grid.Column="5" Text="Звук" VerticalAlignment="Bottom" FontSize="15"/>
+        
+        <Button x:Name="RightBtn" Grid.Row="5"  Grid.Column="2" Click="RightBtn_Click" BorderBrush="White" >
+            <Button.Background>
+                <ImageBrush ImageSource="/26786.png" Stretch="Uniform"/>
+            </Button.Background>
+            <Button.OpacityMask>
+                <ImageBrush ImageSource="/26786.png" Stretch="Uniform"/>
+            </Button.OpacityMask>
+        </Button>
     </Grid>
 </Window>
