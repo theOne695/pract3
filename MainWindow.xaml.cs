@@ -17,7 +17,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using static System.Net.WebRequestMethods;
 
 namespace pract3
 {
@@ -26,16 +25,27 @@ namespace pract3
         private List<string> audioFiles; // Список путей к аудиофайлам
         private int currentFileIndex; // Индекс текущего аудиофайла
         private CancellationTokenSource cancellationTokenSource; // Источник для отмены потока
-        private double maxDuration = 0;
-        private bool IsSliderValueBeingUpdated = false;
+        private bool isAudioPlaying = false; // Флаг, указывающий, проигрывается ли аудио в данный момент
         private DispatcherTimer sliderUpdateTimer;
-        private bool isSliderDragging = false;
 
         public MainWindow()
         {
             InitializeComponent();
             audioFiles = new List<string>();
             currentFileIndex = 0;
+
+            // Создание таймера с интервалом 100 миллисекунд
+            sliderUpdateTimer = new DispatcherTimer();
+            sliderUpdateTimer.Interval = TimeSpan.FromMilliseconds(100);
+            sliderUpdateTimer.Tick += SliderUpdateTimer_Tick;
+        }
+
+        private void SliderUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (media.NaturalDuration.HasTimeSpan)
+            {
+                audioSlider.Value = media.Position.TotalSeconds;
+            }
         }
 
         private void OpenBtn_Click_1(object sender, RoutedEventArgs e)
@@ -82,35 +92,19 @@ namespace pract3
             media.Source = new Uri(audioPath);
             media.Play();
 
-            UpdateAudioSlider();
-            UpdateTimer();
+            isAudioPlaying = true;
+            media.MediaOpened += Media_MediaOpened;
 
-            // Отмена предыдущего потока, если есть
-            cancellationTokenSource?.Cancel();
-
-            // Запуск нового потока для обновления слайдера и таймера
-            cancellationTokenSource = new CancellationTokenSource();
-            CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-            Task.Run(() => UpdateAudioPosition());
+            // Запуск таймера для обновления позиции слайдера
+            sliderUpdateTimer.Start();
         }
 
-        private void UpdateAudioSlider()
+        private void Media_MediaOpened(object sender, RoutedEventArgs e)
         {
+            UpdateTimer();
             audioSlider.Minimum = 0;
-
-            if (media.NaturalDuration.HasTimeSpan)
-            {
-                double maxDuration = media.NaturalDuration.TimeSpan.TotalSeconds;
-
-                // Проверяем, что текущая позиция не выходит за пределы длительности трека
-                double currentPosition = Math.Min(media.Position.TotalSeconds, maxDuration);
-
-                // Устанавливаем значение слайдера пропорционально длительности трека
-                audioSlider.Value = currentPosition;
-
-                timer_end.Text = media.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
-            }
+            audioSlider.Maximum = media.NaturalDuration.TimeSpan.TotalSeconds;
+            media.MediaOpened -= Media_MediaOpened;
         }
 
         private void UpdateTimer()
@@ -129,16 +123,16 @@ namespace pract3
 
         private void UpdateAudioPosition()
         {
-            if (!audioSlider.IsMouseCaptureWithin && media.NaturalDuration.HasTimeSpan)
+            while (!cancellationTokenSource.Token.IsCancellationRequested && media.NaturalDuration.HasTimeSpan)
             {
-                double maxDuration = media.NaturalDuration.TimeSpan.TotalSeconds;
-                double sliderValue = audioSlider.Value;
+                Dispatcher.Invoke(() =>
+                {
+                    audioSlider.Minimum = 0;
+                    audioSlider.Maximum = media.NaturalDuration.TimeSpan.TotalSeconds;
+                    audioSlider.Value = media.Position.TotalSeconds;
+                });
 
-                if (sliderValue > maxDuration)
-                    sliderValue = maxDuration;
-
-                media.Position = TimeSpan.FromSeconds(sliderValue);
-                UpdateTimer();
+                Thread.Sleep(100);
             }
         }
 
@@ -160,7 +154,16 @@ namespace pract3
 
         private void PlayBtn_Click(object sender, RoutedEventArgs e)
         {
-            
+            if (isAudioPlaying)
+            {
+                media.Pause();
+                isAudioPlaying = false;
+            }
+            else
+            {
+                media.Play();
+                isAudioPlaying = true;
+            }
         }
 
         private void LeftBtn_Click(object sender, RoutedEventArgs e)
@@ -208,25 +211,6 @@ namespace pract3
                 media.Position = newPosition;
                 UpdateTimer();
             }
-        }
-        private void SliderUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            if (media.NaturalDuration.HasTimeSpan && !isSliderDragging)
-            {
-                audioSlider.Value = media.Position.TotalSeconds;
-                UpdateTimer();
-            }
-        }
-        private void audioSlider_DragStarted(object sender, RoutedEventArgs e)
-        {
-            isSliderDragging = true;
-        }
-
-        private void audioSlider_DragCompleted(object sender, RoutedEventArgs e)
-        {
-            isSliderDragging = false;
-            media.Position = TimeSpan.FromSeconds(audioSlider.Value);
-            UpdateTimer();
         }
     }
 }
